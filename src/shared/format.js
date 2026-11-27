@@ -12,4 +12,11 @@ export const formatLongDate = iso => {
   return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
+// "sáb 28 nov"
+export const formatShortDate = iso => {
+  if (!iso) return ''
+  const date = new Date(`${iso}T12:00:00`)
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '')
+}
+
 export const BUS_LABEL = { DOS_PISOS_48: 'Bus de dos pisos', UN_PISO_48: 'Bus de un piso' }

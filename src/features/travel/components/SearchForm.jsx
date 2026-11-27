@@ -10,7 +10,7 @@ export function SearchForm({ initial = {}, compact = false }) {
   const navigate = useNavigate()
   const [cities, setCities] = useState([])
   const [origen, setOrigen] = useState(initial.origen || 'Lima')
-  const [destino, setDestino] = useState(initial.destino || 'Trujillo')
+  const [destino, setDestino] = useState(initial.destino || 'Chimbote')
   const [fecha, setFecha] = useState(initial.fecha || todayISO())
   const [error, setError] = useState('')
 

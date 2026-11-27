@@ -48,6 +48,12 @@ Hoy todos los endpoints de venta del backend exigen un token con rol `VENTAS`. M
 
 Contra la VPS, use un backend con **datos de demostración**, no clientes reales, y con el simulador de pagos (`PAYMENT_PROVIDER=mock`). El dominio de la web debe estar en `CORS_ALLOWED_ORIGINS` (ya incluye `http://localhost:5173`).
 
+## Rutas y próximas salidas
+
+Con el backend (`VITE_USE_MOCKS=false`), las rutas destacadas, la página Destinos y las ciudades del buscador muestran **datos reales**: la web consulta la disponibilidad de las rutas de `src/features/travel/services/catalog.js` (`OPERATED_ROUTES`) para los próximos `UPCOMING_DAYS` días y calcula precio desde, cantidad de salidas y próxima salida. Son solo lecturas (`GET /viajes/disponibilidad`) y el resultado se guarda en memoria 2 minutos.
+
+El backend no tiene un endpoint que liste las rutas, por eso la lista está en `catalog.js` (hoy, las 4 rutas con salidas diarias). Son ~28 consultas por carga: con un `GET /api/v1/publico/rutas` y otro de próximas salidas en el backend sería una sola.
+
 ## Cómo funciona una compra
 
 | Paso | Web | Backend |
@@ -69,7 +75,7 @@ Cada opción de la barra de navegación tiene su propia página:
 | Ruta | Página |
 |---|---|
 | `/` | Inicio: buscador, 3 rutas destacadas, pasos de compra y accesos al resto |
-| `/destinos` | Todas las rutas + buscador |
+| `/destinos` | Todas las rutas + buscador + **próximas salidas** de los próximos 7 días |
 | `/servicios` | Beneficios, cómo comprar y flota |
 | `/ayuda` | Preguntas frecuentes por tema, contacto y agencias |
 | `/viajes?origen=&destino=&fecha=` | Resultados de búsqueda |
