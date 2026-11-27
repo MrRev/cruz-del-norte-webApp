@@ -18,6 +18,7 @@ npm run dev
 |---|---|
 | `VITE_API_BASE_URL` | Gateway del backend ([duggandev/cruz-del-norte](https://github.com/duggandev/cruz-del-norte)). Por defecto `https://cruzdelnorte.duckdns.org`. |
 | `VITE_API_USUARIO` / `VITE_API_PASSWORD` | Cuenta de servicio con la que la web se conecta al backend (rol `VENTAS`). |
+| `VITE_DNI_API_TOKEN` / `VITE_DNI_API_KEY` | Opcional. Consulta de nombres por DNI en apiperu.pe, igual que la consola: al escribir los 8 dígitos se completan nombres y apellidos. Sin token, se escriben a mano. |
 
 `.env.local` no se sube al repo. Todo lo que empieza con `VITE_` queda dentro del JavaScript que descarga el navegador.
 
@@ -25,7 +26,9 @@ npm run dev
 
 Hoy el backend exige un token con rol `VENTAS` para consultar viajes, reservar, pagar y emitir pasajes; no tiene endpoints públicos. Por eso la web inicia sesión por detrás con una **cuenta de servicio** (el cliente no ve ningún login) y con ella usa los endpoints actuales.
 
-⚠️ **Esta forma de conexión no se puede publicar.** La contraseña quedaría en el JavaScript, y con el token cualquiera podría leer las reservas, DNI y pagos de todos los pasajeros. Por eso `npm run build` **falla** mientras `VITE_API_PASSWORD` esté configurada. Para generar un build en tu PC (y verlo con `npm run preview`) use `npm run build:local`.
+El backend no tiene consulta de DNI (SC-03 solo valida el formato), por eso la web consulta apiperu.pe directamente, como la consola.
+
+⚠️ **Esta forma de conexión no se puede publicar.** La contraseña quedaría en el JavaScript, y con el token cualquiera podría leer las reservas, DNI y pagos de todos los pasajeros. Lo mismo con el token de apiperu (es de pago). Por eso `npm run build` **falla** mientras `VITE_API_PASSWORD` o el token de DNI estén configurados. Para generar un build en tu PC (y verlo con `npm run preview`) use `npm run build:local`.
 
 Para publicarla, el backend necesita los endpoints públicos de la sección "Endpoints públicos que necesita del backend". Al tenerlos, solo cambian `src/shared/api` y `src/features/*/services`.
 
