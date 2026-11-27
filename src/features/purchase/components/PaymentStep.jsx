@@ -1,4 +1,4 @@
-import { CreditCard, Loader2, ShieldCheck } from 'lucide-react'
+import { Loader2, Lock } from 'lucide-react'
 import { formatSoles } from '../../../shared/format'
 
 // Pago con la pasarela que tenga configurada el backend (SC-04). Hoy el backend
@@ -25,14 +25,9 @@ export function PaymentStep({ seats, passengers, total, busy, onBack, onPay }) {
         })}
       </ul>
 
-      <div className="mt-5 rounded-xl border border-mint-200 bg-mint-50 p-4">
-        <div className="flex items-center gap-2 font-bold text-pine-700"><CreditCard size={19} aria-hidden="true" /> Tarjeta de débito o crédito</div>
-        <p className="mt-1.5 text-sm text-ink-soft">El pago con tarjeta aún no está habilitado en el sistema: la compra se registra y se confirma sin cobro a tu tarjeta.</p>
-      </div>
-
-      <p className="mt-4 flex items-start gap-2 text-sm text-ink-soft">
-        <ShieldCheck size={17} className="mt-0.5 shrink-0 text-pine-600" aria-hidden="true" />
-        Cada pago lleva una clave única: si se corta la conexión y vuelves a intentar, no se cobra dos veces.
+      <p className="mt-5 flex items-center gap-2 text-sm text-ink-soft">
+        <Lock size={15} className="shrink-0 text-pine-600" aria-hidden="true" />
+        <span><strong className="font-semibold text-pine-700">Pago seguro.</strong> Tu compra está protegida y nunca se procesa dos veces.</span>
       </p>
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
