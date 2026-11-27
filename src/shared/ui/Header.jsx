@@ -1,25 +1,35 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, NavLink, useLocation } from 'react-router'
 import { Logo } from './Logo'
 
-const links = [
-  { href: '/#destinos', label: 'Destinos' },
-  { href: '/#servicios', label: 'Servicios' },
-  { href: '/#mis-pasajes', label: 'Mis pasajes' },
-  { href: '/#ayuda', label: 'Ayuda' },
+export const NAV_LINKS = [
+  { to: '/', label: 'Inicio', end: true },
+  { to: '/destinos', label: 'Destinos' },
+  { to: '/servicios', label: 'Servicios' },
+  { to: '/mis-pasajes', label: 'Mis pasajes' },
+  { to: '/ayuda', label: 'Ayuda' },
 ]
 
 export function Header({ overlay = false }) {
   const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+  useEffect(() => { setOpen(false) }, [pathname])
+
   const light = overlay && !open
+  const desktopLink = ({ isActive }) => {
+    const base = 'relative py-1 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:transition'
+    if (light) return `${base} ${isActive ? 'text-white after:bg-amber-400' : 'text-mint-50/80 hover:text-white after:bg-transparent'}`
+    return `${base} ${isActive ? 'text-ink after:bg-amber-400' : 'text-ink-soft hover:text-ink after:bg-transparent'}`
+  }
+
   return (
-    <header className={`${overlay ? 'absolute inset-x-0 top-0 z-30' : 'sticky top-0 z-30 border-b border-line bg-white/95 backdrop-blur'} ${open ? 'bg-white' : ''}`}>
+    <header className={`${overlay ? 'absolute inset-x-0 top-0' : 'sticky top-0 border-b border-line bg-white/95 backdrop-blur'} z-30 ${open ? 'bg-white' : ''}`}>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Logo light={light} />
         <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">
-          {links.map(link => (
-            <Link key={link.href} to={link.href} className={`text-sm font-medium transition-colors ${light ? 'text-mint-50/85 hover:text-white' : 'text-ink-soft hover:text-ink'}`}>{link.label}</Link>
+          {NAV_LINKS.map(link => (
+            <NavLink key={link.to} to={link.to} end={link.end} className={desktopLink}>{link.label}</NavLink>
           ))}
           <Link to="/#buscar" className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-bold text-pine-900 transition hover:bg-amber-500">Comprar pasaje</Link>
         </nav>
@@ -29,10 +39,10 @@ export function Header({ overlay = false }) {
       </div>
       {open && (
         <nav id="menu-movil" className="border-t border-line bg-white px-4 pb-4 md:hidden" aria-label="Principal móvil">
-          {links.map(link => (
-            <Link key={link.href} to={link.href} onClick={() => setOpen(false)} className="block border-b border-line py-3 text-[15px] font-medium text-ink">{link.label}</Link>
+          {NAV_LINKS.map(link => (
+            <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => `block border-b border-line py-3 text-[15px] font-medium ${isActive ? 'text-pine-600' : 'text-ink'}`}>{link.label}</NavLink>
           ))}
-          <Link to="/#buscar" onClick={() => setOpen(false)} className="mt-4 block rounded-lg bg-amber-400 py-3 text-center font-bold text-pine-900">Comprar pasaje</Link>
+          <Link to="/#buscar" className="mt-4 block rounded-lg bg-amber-400 py-3 text-center font-bold text-pine-900">Comprar pasaje</Link>
         </nav>
       )}
     </header>

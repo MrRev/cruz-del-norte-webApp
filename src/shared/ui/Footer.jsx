@@ -1,8 +1,8 @@
 import { BookOpenText, Mail, MapPin, Phone } from 'lucide-react'
 import { Link } from 'react-router'
 import { Logo } from './Logo'
+import { CONTACT } from '../contact'
 
-// Datos de contacto de ejemplo: reemplazar por los reales de la empresa.
 export function Footer() {
   return (
     <footer className="bg-pine-950 text-mint-50/80">
@@ -15,9 +15,10 @@ export function Footer() {
           <h2 className="text-sm font-bold text-white">Viaja</h2>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li><Link to="/#buscar" className="hover:text-white">Comprar pasaje</Link></li>
-            <li><Link to="/#destinos" className="hover:text-white">Destinos</Link></li>
-            <li><Link to="/#mis-pasajes" className="hover:text-white">Mis pasajes</Link></li>
-            <li><Link to="/#ayuda" className="hover:text-white">Preguntas frecuentes</Link></li>
+            <li><Link to="/destinos" className="hover:text-white">Destinos</Link></li>
+            <li><Link to="/servicios" className="hover:text-white">Servicios</Link></li>
+            <li><Link to="/mis-pasajes" className="hover:text-white">Mis pasajes</Link></li>
+            <li><Link to="/ayuda" className="hover:text-white">Preguntas frecuentes</Link></li>
           </ul>
         </div>
         <div>
@@ -33,9 +34,9 @@ export function Footer() {
         <div>
           <h2 className="text-sm font-bold text-white">Contacto</h2>
           <ul className="mt-4 space-y-3 text-sm">
-            <li className="flex gap-2"><Phone size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> (01) 000-0000</li>
-            <li className="flex gap-2"><Mail size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> ventas@cruzdelnorte.pe</li>
-            <li className="flex gap-2"><MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> Terminal Lima Norte, Lima</li>
+            <li className="flex gap-2"><Phone size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> {CONTACT.phone}</li>
+            <li className="flex gap-2"><Mail size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> {CONTACT.email}</li>
+            <li className="flex gap-2"><MapPin size={16} className="mt-0.5 shrink-0" aria-hidden="true" /> {CONTACT.agencies[0].address}</li>
           </ul>
         </div>
       </div>

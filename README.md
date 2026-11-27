@@ -28,18 +28,27 @@ Todo lo que empieza con `VITE_` queda visible en el JavaScript publicado: **nunc
 
 ## Estado actual
 
-- ✅ Landing: portada con buscador, rutas más elegidas, servicios, pasos de compra, flota, "Mis pasajes", preguntas frecuentes y pie con Libro de Reclamaciones.
-- ✅ Resultados de búsqueda (`/viajes?origen=&destino=&fecha=`).
+Cada opción de la barra de navegación tiene su propia página:
+
+| Ruta | Página |
+|---|---|
+| `/` | Inicio: buscador, 3 rutas destacadas, pasos de compra y accesos al resto |
+| `/destinos` | Todas las rutas + buscador |
+| `/servicios` | Beneficios, cómo comprar y flota |
+| `/mis-pasajes` | Consulta de pasaje por código + DNI |
+| `/ayuda` | Preguntas frecuentes por tema, contacto y agencias |
+| `/viajes?origen=&destino=&fecha=` | Resultados de búsqueda |
+
+- ⏳ Datos de contacto y agencias de ejemplo en `src/shared/contact.js`; preguntas frecuentes en `src/features/landing/components/Faq.jsx`.
 - ⏳ Compra en línea (asientos, pasajeros, pago, PDF): pendiente de los endpoints públicos del backend. `/compra/:idViaje` muestra por ahora un aviso.
 - ⏳ Términos, privacidad y Libro de Reclamaciones: páginas provisionales, pendientes del contenido legal.
-- ⏳ Teléfonos, correo, dirección y textos de preguntas frecuentes son de ejemplo.
 
 ## Datos de ejemplo
 
 Con `VITE_USE_MOCKS=true`:
 
 - Rutas desde Lima a Trujillo, Chimbote, Chiclayo, Piura, Ica y Huaraz (y viceversa). Otras combinaciones devuelven "sin salidas".
-- "Mis pasajes": código `CN-DEMO-001` con DNI `45871236`.
+- Mis pasajes: código `CN-DEMO-001` con DNI `45871236`.
 
 Las respuestas imitan el formato real del backend (`DisponibilidadResponse` de SC-01), así que el cambio a la API real no requiere tocar componentes.
 
@@ -59,14 +68,15 @@ Hoy todos los endpoints de venta exigen un token con rol `VENTAS`, que no puede 
 ```text
 src/
   app/App.jsx                 rutas y scroll a secciones
-  pages/                      páginas (inicio, resultados, informativas)
+  pages/                      una página por opción del menú + resultados e informativas
   features/
-    landing/components/       secciones de la portada
+    landing/components/       secciones reutilizables (hero, rutas, servicios, FAQ)
     travel/                   buscador y servicio de viajes (+ datos de ejemplo)
     tickets/                  consulta de pasajes
   shared/
     api/http.js               cliente HTTP (sin tokens del personal)
-    ui/                       cabecera, pie y logo
+    ui/                       cabecera, pie, logo y encabezado de página
+    contact.js                teléfonos, correo y agencias (de ejemplo)
     format.js                 moneda y fechas en es-PE
   styles.css                  Tailwind + paleta de la marca
 ```
