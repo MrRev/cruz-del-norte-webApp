@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { CheckCircle2, Loader2 } from 'lucide-react'
-import { DNI_LOOKUP_ENABLED, lookupDni } from '../services/dniService'
+import { dniLookupAvailable, lookupDni } from '../services/dniService'
 
 const inputClass = 'mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-[15px] text-ink outline-none focus:ring-3 focus:ring-mint-200/60'
 
@@ -31,10 +31,10 @@ export function PassengersStep({ seats, initial, busy, onBack, onSubmit }) {
 
   const onDniChange = async (id, dni) => {
     latestDni.current[id] = dni
-    if (!DNI_LOOKUP_ENABLED || dni.length !== 8) { setLookup(l => ({ ...l, [id]: undefined })); return }
+    if (!dniLookupAvailable() || dni.length !== 8) { setLookup(l => ({ ...l, [id]: undefined })); return }
     setLookup(l => ({ ...l, [id]: { status: 'buscando' } }))
     try {
-      const person = await lookupDni(dni)
+      const person = await lookupDni(dni, seats.find(s => s.idReserva === id)?.token)
       if (latestDni.current[id] !== dni) return // el cliente cambió el DNI mientras se buscaba
       setValues(v => {
         const current = v[id]
@@ -48,7 +48,8 @@ export function PassengersStep({ seats, initial, busy, onBack, onSubmit }) {
       setLookup(l => ({ ...l, [id]: { status: 'ok' } }))
     } catch (error) {
       if (latestDni.current[id] !== dni) return
-      setLookup(l => ({ ...l, [id]: { status: 'error', message: error.message } }))
+      // Sin consulta configurada en el servidor: el cliente escribe los datos, sin aviso.
+      setLookup(l => ({ ...l, [id]: error.status === 501 ? undefined : { status: 'error', message: error.message } }))
     }
   }
 
@@ -73,7 +74,7 @@ export function PassengersStep({ seats, initial, busy, onBack, onSubmit }) {
   return (
     <form onSubmit={submit} noValidate>
       <h2 className="text-xl font-bold text-ink">Datos de los pasajeros</h2>
-      <p className="mt-1 text-sm text-ink-soft">Deben coincidir con el DNI que presentarán al abordar.{DNI_LOOKUP_ENABLED && ' Al ingresar el DNI completamos nombres y apellidos.'}</p>
+      <p className="mt-1 text-sm text-ink-soft">Deben coincidir con el DNI que presentarán al abordar.</p>
       <div className="mt-6 space-y-5">
         {seats.map((seat, index) => {
           const v = values[seat.idReserva]

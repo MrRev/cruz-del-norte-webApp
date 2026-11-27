@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getApprovedPayment, holdSeat, issueTicket, newIdempotencyKey, pay, releaseSeat, setPassenger } from '../services/purchaseService'
+import { holdSeat, issueTicket, newIdempotencyKey, pay, releaseSeat, setPassenger } from '../services/purchaseService'
 
 export const MAX_SEATS = 10
 const storageKey = idViaje => `cdn-compra-${idViaje}`
@@ -10,7 +10,7 @@ function load(idViaje) {
     const saved = JSON.parse(sessionStorage.getItem(storageKey(idViaje)) || 'null')
     if (!saved) return emptyState
     // Una compra sin terminar cuyas reservas ya vencieron no se restaura.
-    const expired = saved.step !== 'listo' && saved.seats.some(s => new Date(s.vencimiento) <= new Date())
+    const expired = saved.step !== 'listo' && saved.seats.some(s => new Date(s.vencimiento) <= new Date() || !s.token)
     return expired ? emptyState : { ...emptyState, ...saved }
   } catch {
     return emptyState
@@ -49,7 +49,7 @@ export function usePurchase(idViaje) {
   const toggleSeat = useCallback(seat => run(async () => {
     const selected = state.seats.find(s => s.idAsiento === seat.idAsiento)
     if (selected) {
-      await releaseSeat(selected.idReserva).catch(() => {}) // si ya venció, igual se quita
+      await releaseSeat(selected.token).catch(() => {}) // si ya venció, igual se quita
       setState(s => ({ ...s, seats: s.seats.filter(x => x.idAsiento !== seat.idAsiento) }))
       return
     }
@@ -57,14 +57,14 @@ export function usePurchase(idViaje) {
     const hold = await holdSeat(Number(idViaje), seat.idAsiento)
     setState(s => ({
       ...s,
-      seats: [...s.seats, { idAsiento: seat.idAsiento, idReserva: hold.idReserva, numero: seat.numero, piso: seat.piso, tipo: seat.tipo, precio: seat.precio, vencimiento: hold.vencimiento }],
+      seats: [...s.seats, { idAsiento: seat.idAsiento, idReserva: hold.idReserva, token: hold.token, numero: seat.numero, piso: seat.piso, tipo: seat.tipo, precio: seat.precio, vencimiento: hold.vencimiento }],
     }))
   }), [idViaje, run, state.seats])
 
   const goTo = step => { setError(''); setState(s => ({ ...s, step })) }
 
   const savePassengers = useCallback(passengers => run(async () => {
-    for (const seat of state.seats) await setPassenger(seat.idReserva, passengers[seat.idReserva])
+    for (const seat of state.seats) await setPassenger(seat.token, passengers[seat.idReserva])
     setState(s => ({ ...s, passengers, step: 'pago' }))
   }), [run, state.seats])
 
@@ -78,21 +78,16 @@ export function usePurchase(idViaje) {
         if (!payment?.idTransaccion) {
           const key = payment?.key || newIdempotencyKey()
           payments[seat.idReserva] = { key }
-          try {
-            const result = await pay({ idReserva: seat.idReserva, importe: seat.precio, idempotencyKey: key })
-            if (result.estado !== 'APROBADO') {
-              delete payments[seat.idReserva] // un nuevo intento necesita otra clave
-              throw new Error(result.estado === 'PENDIENTE' ? 'El pago quedó pendiente de confirmación.' : 'El pago fue rechazado. Intenta nuevamente.')
-            }
-            payment = { key, idTransaccion: result.idTransaccion }
-          } catch (e) {
-            if (e.status !== 409 || !/pago aprobado/i.test(e.message)) throw e
-            const approved = await getApprovedPayment(seat.idReserva) // ya estaba pagado
-            payment = { key, idTransaccion: approved.idTransaccion }
+          // Si ya estaba pagada (p. ej. se cortó la conexión), el servidor devuelve ese pago.
+          const result = await pay({ token: seat.token, importe: seat.precio, idempotencyKey: key })
+          if (result.estado !== 'APROBADO') {
+            delete payments[seat.idReserva] // un nuevo intento necesita otra clave
+            throw new Error(result.estado === 'PENDIENTE' ? 'El pago quedó pendiente de confirmación.' : 'El pago fue rechazado. Intenta nuevamente.')
           }
+          payment = { key, idTransaccion: result.idTransaccion }
           payments[seat.idReserva] = payment
         }
-        tickets[seat.idReserva] = await issueTicket(seat.idReserva, payment.idTransaccion)
+        tickets[seat.idReserva] = await issueTicket(seat.token, payment.idTransaccion)
       }
       setState(s => ({ ...s, payments, tickets, step: 'listo' }))
     } finally {
@@ -109,7 +104,7 @@ export function usePurchase(idViaje) {
     try { sessionStorage.removeItem(storageKey(idViaje)) } catch { /* modo privado */ }
     setError('')
     setState(emptyState)
-    return Promise.all(toRelease.map(s => releaseSeat(s.idReserva).catch(() => {})))
+    return Promise.all(toRelease.map(s => releaseSeat(s.token).catch(() => {})))
   }, [idViaje, state.seats, state.step])
 
   return { state, busy, error, setError, secondsLeft, expired, total, toggleSeat, goTo, savePassengers, payAndIssue, reset }
