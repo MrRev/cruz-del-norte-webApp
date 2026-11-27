@@ -76,7 +76,7 @@ export function SearchResultsPage() {
                             <span className="block text-xs text-muted">desde</span>
                             <span className="text-2xl font-extrabold text-amber-600">{formatSoles(viaje.tarifa)}</span>
                           </span>
-                          <Link to={`/compra/${viaje.idViaje}`} className="flex h-11 items-center gap-1.5 rounded-lg bg-amber-400 px-5 font-bold text-pine-900 transition hover:bg-amber-500">
+                          <Link to={`/compra/${viaje.idViaje}?${new URLSearchParams({ origen, destino, fecha, hora: viaje.horaSalida })}`} className="flex h-11 items-center gap-1.5 rounded-lg bg-amber-400 px-5 font-bold text-pine-900 transition hover:bg-amber-500">
                             Elegir asiento <ArrowRight size={16} aria-hidden="true" />
                           </Link>
                         </div>

@@ -1,13 +1,25 @@
-// Cliente HTTP de la web pública. A diferencia de la consola, nunca envía
-// tokens del personal: solo consume endpoints públicos del gateway.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cruzdelnorte.duckdns.org'
-export const USE_MOCKS = (import.meta.env.VITE_USE_MOCKS ?? 'true') !== 'false'
+import { API_BASE_URL } from './config'
+import { getDemoToken } from './demoAuth'
 
-export async function request(path, options = {}) {
+export { API_BASE_URL, USE_MOCKS, DEMO_VENTAS } from './config'
+
+// Cliente HTTP de la web. Solo adjunta un token en el modo de pruebas
+// DEMO_VENTAS; en producción consumirá endpoints públicos sin token del personal.
+export async function request(path, options = {}, retried = false) {
   const headers = new Headers(options.headers || {})
   headers.set('Accept', 'application/json')
   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  const token = await getDemoToken()
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+
   const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
+
+  // Token vencido: se renueva una vez y se reintenta.
+  if (response.status === 401 && token && !retried) {
+    await getDemoToken({ force: true })
+    return request(path, options, true)
+  }
+
   const raw = await response.text()
   let data = null
   try { data = raw ? JSON.parse(raw) : null } catch { data = raw }
@@ -17,7 +29,7 @@ export async function request(path, options = {}) {
     error.data = data
     throw error
   }
-  return data
+  return data // 204 (sin resultados) devuelve null
 }
 
 // Simula la latencia de red en modo de datos de ejemplo.

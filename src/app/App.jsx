@@ -7,6 +7,7 @@ import { InfoPage } from '../pages/InfoPage'
 import { DestinationsPage } from '../pages/DestinationsPage'
 import { ServicesPage } from '../pages/ServicesPage'
 import { HelpPage } from '../pages/HelpPage'
+import { PurchasePage } from '../pages/PurchasePage'
 
 // Al cambiar de página vuelve arriba; si la URL trae #ancla, baja a esa sección.
 function ScrollManager() {
@@ -41,12 +42,7 @@ export function App() {
             <Route path="/servicios" element={<ServicesPage />} />
             <Route path="/ayuda" element={<HelpPage />} />
             <Route path="/viajes" element={<SearchResultsPage />} />
-            <Route path="/compra/:idViaje" element={
-              <InfoPage title="Compra en línea">
-                <p>Muy pronto podrás elegir tu asiento en el mapa del bus y pagar en línea desde aquí.</p>
-                <p>Mientras tanto, puedes comprar tu pasaje en cualquiera de nuestras agencias.</p>
-              </InfoPage>
-            } />
+            <Route path="/compra/:idViaje" element={<PurchasePage />} />
             <Route path="/terminos" element={<InfoPage title="Términos y condiciones"><p>Contenido pendiente de revisión legal.</p></InfoPage>} />
             <Route path="/privacidad" element={<InfoPage title="Política de privacidad"><p>Contenido pendiente de revisión legal.</p></InfoPage>} />
             <Route path="/libro-de-reclamaciones" element={
