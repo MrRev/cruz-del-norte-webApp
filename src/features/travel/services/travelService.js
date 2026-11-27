@@ -1,12 +1,9 @@
-import { USE_MOCKS, delay, request } from '../../../shared/api/http'
+import { request } from '../../../shared/api/http'
 import { todayISO } from '../../../shared/format'
-import { CITIES, ROUTES, mockAvailability } from './mockData'
 import { OPERATED_ROUTES, UPCOMING_DAYS } from './catalog'
 
-// SC-01. En el modo de pruebas usa el endpoint actual (requiere rol VENTAS).
-// Público propuesto: GET /api/v1/publico/viajes/disponibilidad
+// SC-01: salidas de una ruta y fecha.
 export async function searchTrips({ origen, destino, fecha }) {
-  if (USE_MOCKS) { await delay(); return mockAvailability({ origen, destino, fecha }) }
   const params = new URLSearchParams({ origen, destino, fecha })
   const data = await request(`/api/v1/viajes/disponibilidad?${params}`)
   return data || { origen, destino, fecha, viajes: [] } // 204 = sin salidas
@@ -33,8 +30,7 @@ export function getUpcomingTrips() {
   if (upcomingCache && Date.now() - upcomingCache.at < CACHE_MS) return upcomingCache.promise
   const today = todayISO()
   const dates = Array.from({ length: UPCOMING_DAYS }, (_, i) => addDays(today, i))
-  const routes = USE_MOCKS ? ROUTES : OPERATED_ROUTES
-  const promise = Promise.all(routes.flatMap(route => dates.map(async fecha => {
+  const promise = Promise.all(OPERATED_ROUTES.flatMap(route => dates.map(async fecha => {
     const data = await searchTrips({ origen: route.origen, destino: route.destino, fecha })
     return (data.viajes || []).map(viaje => ({ ...viaje, origen: route.origen, destino: route.destino, fecha, duracion: viaje.duracion || route.duracion }))
   })))
@@ -50,7 +46,6 @@ export function getUpcomingTrips() {
 // Rutas para la portada, Destinos y el buscador, con datos reales:
 // precio desde, cantidad de salidas y próxima salida en los próximos días.
 export async function getRoutes() {
-  if (USE_MOCKS) { await delay(); return { ciudades: CITIES, rutas: ROUTES } }
   const trips = await getUpcomingTrips()
   const rutas = OPERATED_ROUTES.map(route => {
     const own = trips.filter(t => t.origen === route.origen && t.destino === route.destino)

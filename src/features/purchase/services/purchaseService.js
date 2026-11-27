@@ -17,7 +17,8 @@ export const releaseSeat = idReserva =>
 export const setPassenger = (idReserva, { dni, nombres, apellidos }) =>
   request(`/api/v1/reservas/${idReserva}/pasajero`, { method: 'PATCH', body: JSON.stringify({ dni, nombres, apellidos }) })
 
-// SC-04: pago con la pasarela (simulador del backend en esta etapa).
+// SC-04: pago. tokenPasarela es el que acepta el simulador del backend mientras
+// no exista una pasarela real.
 // La misma Idempotency-Key garantiza que un reintento no cobre dos veces.
 export const pay = ({ idReserva, importe, idempotencyKey, tokenPasarela = 'mock_aprobado' }) =>
   request('/api/v1/pagos', {

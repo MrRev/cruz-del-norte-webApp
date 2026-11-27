@@ -2,55 +2,38 @@
 
 Landing y venta de pasajes en línea para clientes de Cruz del Norte. Usa el mismo stack que la consola de operaciones ([duggandev/cruz-del-norte-w](https://github.com/duggandev/cruz-del-norte-w)): **React + Vite + Tailwind CSS**, con íconos de lucide-react y `react-router` para las páginas.
 
+Muestra **solo datos reales** del backend (viajes, asientos, precios) a través de la API: no hay datos de ejemplo.
+
 ## Ejecutar
 
 ```bash
 npm install
-cp .env.example .env
+cp .env.example .env.local   # y complete VITE_API_PASSWORD
 npm run dev
 ```
 
-Build de producción en `dist/`:
-
-```bash
-npm run build
-npm run preview
-```
-
-## Variables de entorno
+## Variables de entorno (`.env.local`)
 
 | Variable | Uso |
 |---|---|
-| `VITE_API_BASE_URL` | URL del gateway del backend ([duggandev/cruz-del-norte](https://github.com/duggandev/cruz-del-norte)). |
-| `VITE_USE_MOCKS` | `true` (por defecto): datos de ejemplo, se puede buscar pero no comprar. `false`: usa el backend. |
-| `VITE_DEMO_VENTAS` | **Solo pruebas locales.** `true`: la web inicia sesión por detrás con una cuenta de ventas para poder comprar con los endpoints actuales. |
-| `VITE_DEMO_USUARIO` / `VITE_DEMO_PASSWORD` | Cuenta de ventas para `VITE_DEMO_VENTAS`. Póngala en `.env.local` (no se sube al repo). |
+| `VITE_API_BASE_URL` | Gateway del backend ([duggandev/cruz-del-norte](https://github.com/duggandev/cruz-del-norte)). Por defecto `https://cruzdelnorte.duckdns.org`. |
+| `VITE_API_USUARIO` / `VITE_API_PASSWORD` | Cuenta de servicio con la que la web se conecta al backend (rol `VENTAS`). |
 
-Todo lo que empieza con `VITE_` queda visible en el JavaScript publicado: **nunca** publique claves privadas ni credenciales del personal.
+`.env.local` no se sube al repo. Todo lo que empieza con `VITE_` queda dentro del JavaScript que descarga el navegador.
 
-## Conectar con el backend (compra completa)
+## Conexión con el backend
 
-Hoy todos los endpoints de venta del backend exigen un token con rol `VENTAS`. Mientras se crean los endpoints públicos con token de invitado, la web puede probarse de punta a punta en **modo de pruebas**: inicia sesión con la cuenta de ventas en segundo plano (el cliente no ve ningún login).
+Hoy el backend exige un token con rol `VENTAS` para consultar viajes, reservar, pagar y emitir pasajes; no tiene endpoints públicos. Por eso la web inicia sesión por detrás con una **cuenta de servicio** (el cliente no ve ningún login) y con ella usa los endpoints actuales.
 
-1. Cree `.env.local`:
+⚠️ **Esta forma de conexión no se puede publicar.** La contraseña quedaría en el JavaScript, y con el token cualquiera podría leer las reservas, DNI y pagos de todos los pasajeros. Por eso `npm run build` **falla** mientras `VITE_API_PASSWORD` esté configurada. Para generar un build en tu PC (y verlo con `npm run preview`) use `npm run build:local`.
 
-   ```bash
-   VITE_API_BASE_URL=https://cruzdelnorte.duckdns.org   # o http://localhost:8080 con un backend local
-   VITE_USE_MOCKS=false
-   VITE_DEMO_VENTAS=true
-   VITE_DEMO_USUARIO=ventas
-   VITE_DEMO_PASSWORD=la-contraseña-de-ventas
-   ```
+Para publicarla, el backend necesita los endpoints públicos de la sección "Endpoints públicos que necesita del backend". Al tenerlos, solo cambian `src/shared/api` y `src/features/*/services`.
 
-2. `npm run dev` y compre desde el buscador.
-
-⚠️ **Nunca publique la web con `VITE_DEMO_VENTAS=true`.** Cualquiera podría copiar el token desde el navegador y leer las reservas, DNI y pagos de todos los pasajeros. Por eso `npm run build` **falla** si la opción está activa. `npm run build:demo` permite un build local para probar con `npm run preview`.
-
-Contra la VPS, use un backend con **datos de demostración**, no clientes reales, y con el simulador de pagos (`PAYMENT_PROVIDER=mock`). El dominio de la web debe estar en `CORS_ALLOWED_ORIGINS` (ya incluye `http://localhost:5173`).
+El dominio desde el que se abre la web debe estar en `CORS_ALLOWED_ORIGINS` del backend (ya incluye `http://localhost:5173`).
 
 ## Rutas y próximas salidas
 
-Con el backend (`VITE_USE_MOCKS=false`), las rutas destacadas, la página Destinos y las ciudades del buscador muestran **datos reales**: la web consulta la disponibilidad de las rutas de `src/features/travel/services/catalog.js` (`OPERATED_ROUTES`) para los próximos `UPCOMING_DAYS` días y calcula precio desde, cantidad de salidas y próxima salida. Son solo lecturas (`GET /viajes/disponibilidad`) y el resultado se guarda en memoria 2 minutos.
+Las rutas destacadas, la página Destinos y las ciudades del buscador muestran **datos reales**: la web consulta la disponibilidad de las rutas de `src/features/travel/services/catalog.js` (`OPERATED_ROUTES`) para los próximos `UPCOMING_DAYS` días y calcula precio desde, cantidad de salidas y próxima salida. Son solo lecturas (`GET /viajes/disponibilidad`) y el resultado se guarda en memoria 2 minutos.
 
 El backend no tiene un endpoint que liste las rutas, por eso la lista está en `catalog.js` (hoy, las 4 rutas con salidas diarias). Son ~28 consultas por carga: con un `GET /api/v1/publico/rutas` y otro de próximas salidas en el backend sería una sola.
 
@@ -63,8 +46,10 @@ El backend no tiene un endpoint que liste las rutas, por eso la lista está en `
 | Tocar un asiento | Se reserva al instante y empieza la cuenta regresiva | `POST /reservas/hold` → reserva `TEMPORAL` (SC-02) |
 | Quitar un asiento / salir | Se libera | `POST /reservas/{id}/liberacion` (SC-02) |
 | Datos de pasajeros | DNI, nombres y apellidos por asiento | `PATCH /reservas/{id}/pasajero` (SC-02) |
-| Pago | Un pago por asiento con `Idempotency-Key` propia: reintentar no cobra dos veces | `POST /pagos` con el simulador `mock_aprobado` (SC-04) → reserva `CONFIRMADA` |
+| Pago | Un pago por asiento con `Idempotency-Key` propia: reintentar no cobra dos veces | `POST /pagos` (SC-04) → reserva `CONFIRMADA` |
 | Pasajes | Código y PDF por pasajero | `POST /pasajes` (SC-05) → `/documentos/{codigo}.pdf` |
+
+**Sobre el pago:** el backend todavía no tiene una pasarela real (el proveedor Culqi no está implementado), así que aprueba los pagos con su simulador y no hay cobro a la tarjeta. La web lo indica en el paso de pago. Cuando el backend tenga Culqi, en ese paso va el formulario de tarjeta.
 
 El precio de cada asiento lo calcula el backend (el mapa trae el precio y el pago debe coincidir). La compra en curso se guarda en `sessionStorage`: recargar la página no pierde los asientos; si la reserva vence, se ofrece elegir de nuevo.
 
@@ -82,21 +67,14 @@ Cada opción de la barra de navegación tiene su propia página:
 | `/compra/:idViaje` | Compra: asientos → pasajeros → pago → pasajes |
 
 - ⏳ Datos de contacto y agencias de ejemplo en `src/shared/contact.js`; preguntas frecuentes en `src/features/landing/components/Faq.jsx`.
-- ✅ Compra en línea (asientos, pasajeros, pago simulado, PDF) en modo de pruebas con `VITE_DEMO_VENTAS`.
-- ⏳ Compra para el público: pendiente del token de invitado en el backend (ver abajo).
+- ✅ Compra completa con datos reales: asientos, pasajeros, pago (sin cobro: el backend no tiene pasarela) y pasajes en PDF.
+- ⏳ Publicación: pendiente de los endpoints públicos del backend (ver abajo).
+- ⏳ Pago con tarjeta: pendiente de la integración de Culqi en el backend.
 - ⏳ Términos, privacidad y Libro de Reclamaciones: páginas provisionales, pendientes del contenido legal.
-
-## Datos de ejemplo
-
-Con `VITE_USE_MOCKS=true`:
-
-- Rutas desde Lima a Trujillo, Chimbote, Chiclayo, Piura, Ica y Huaraz (y viceversa). Otras combinaciones devuelven "sin salidas".
-
-Las respuestas imitan el formato real del backend (`DisponibilidadResponse` de SC-01), así que el cambio a la API real no requiere tocar componentes.
 
 ## Endpoints públicos que necesita del backend
 
-Para publicar la web hay que reemplazar el modo de pruebas por endpoints sin login del personal. Solo cambia la capa `src/features/*/services`; las páginas no se tocan:
+Para publicar la web hay que reemplazar la cuenta de servicio por endpoints sin login del personal. Solo cambia la capa `src/features/*/services`; las páginas no se tocan:
 
 | Endpoint | Para |
 |---|---|
@@ -113,10 +91,10 @@ src/
   pages/                      una página por opción del menú + resultados e informativas
   features/
     landing/components/       secciones reutilizables (hero, rutas, servicios, FAQ)
-    travel/                   buscador y servicio de viajes (+ datos de ejemplo)
+    travel/                   buscador, servicio de viajes y rutas operadas (catalog.js)
     purchase/                 compra: hook usePurchase, mapa de asientos, pasos y servicios
   shared/
-    api/                      cliente HTTP, configuración y acceso de pruebas (demoAuth)
+    api/                      cliente HTTP, configuración y cuenta de servicio (serviceAuth)
     ui/                       cabecera, pie, logo y encabezado de página
     contact.js                teléfonos, correo y agencias (de ejemplo)
     format.js                 moneda y fechas en es-PE
@@ -125,7 +103,7 @@ src/
 
 ## Despliegue
 
-Es una SPA: el servidor debe devolver `index.html` para cualquier ruta. En nginx:
+Requiere primero los endpoints públicos (ver arriba). Es una SPA: el servidor debe devolver `index.html` para cualquier ruta. En nginx:
 
 ```nginx
 location / {

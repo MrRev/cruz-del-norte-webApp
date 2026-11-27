@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { AlertCircle, Loader2, RotateCcw } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { Header } from '../shared/ui/Header'
-import { InfoPage } from './InfoPage'
-import { USE_MOCKS } from '../shared/api/http'
 import { getSeatMap } from '../features/travel/services/travelService'
 import { MAX_SEATS, usePurchase } from '../features/purchase/hooks/usePurchase'
 import { SeatMap } from '../features/purchase/components/SeatMap'
@@ -15,18 +13,6 @@ import { PurchaseSummary, Stepper } from '../features/purchase/components/Purcha
 const MAP_REFRESH_MS = 15_000
 
 export function PurchasePage() {
-  if (USE_MOCKS) {
-    return (
-      <InfoPage title="Compra en línea">
-        <p>La web está usando datos de ejemplo (<code>VITE_USE_MOCKS=true</code>), así que no puede reservar ni cobrar.</p>
-        <p>Para probar la compra completa, conecta el backend: revisa la sección "Conectar con el backend" del README.</p>
-      </InfoPage>
-    )
-  }
-  return <Purchase />
-}
-
-function Purchase() {
   const { idViaje } = useParams()
   const [params] = useSearchParams()
   const trip = { origen: params.get('origen') || '', destino: params.get('destino') || '', fecha: params.get('fecha') || '', hora: params.get('hora') || '' }

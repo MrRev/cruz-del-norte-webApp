@@ -1,11 +1,12 @@
-// Configuración de la conexión con el backend (ver .env.example).
+// Conexión con el backend (ver .env.example). La web muestra solo datos reales
+// devueltos por la API; no hay datos de ejemplo.
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://cruzdelnorte.duckdns.org').replace(/\/$/, '')
 
-// true: datos de ejemplo locales, sin backend (solo búsqueda; no permite comprar).
-export const USE_MOCKS = (import.meta.env.VITE_USE_MOCKS ?? 'true') !== 'false'
-
-// SOLO PRUEBAS: la web inicia sesión por detrás con una cuenta de VENTAS para
-// usar los endpoints actuales del backend. vite.config.js impide compilar para
-// producción con esta opción activa, porque el token permitiría leer los datos
-// de todos los pasajeros. Se reemplaza por el token de compra de invitado.
-export const DEMO_VENTAS = import.meta.env.VITE_DEMO_VENTAS === 'true'
+// Cuenta de servicio con la que la web se autentica ante el backend.
+// Hoy el backend exige un token con rol VENTAS para consultar viajes, reservar,
+// pagar y emitir pasajes, así que la web inicia sesión por detrás con esa cuenta.
+// Ese token permite leer los datos de TODOS los pasajeros: vite.config.js impide
+// compilar para producción mientras esté configurada. Se elimina cuando el
+// backend tenga endpoints públicos con token de compra de invitado.
+export const SERVICE_USER = import.meta.env.VITE_API_USUARIO || ''
+export const SERVICE_PASSWORD = import.meta.env.VITE_API_PASSWORD || ''

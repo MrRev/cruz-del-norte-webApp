@@ -1,8 +1,9 @@
 import { CreditCard, Loader2, ShieldCheck } from 'lucide-react'
 import { formatSoles } from '../../../shared/format'
 
-// Pago con la pasarela del backend. En esta etapa el backend usa su simulador
-// (token mock_aprobado); con Culqi real aquí iría el formulario de tarjeta.
+// Pago con la pasarela que tenga configurada el backend (SC-04). Hoy el backend
+// no tiene una pasarela real (Culqi no está implementado) y aprueba los pagos con
+// su simulador; cuando exista, aquí irá el formulario de tarjeta (Culqi.js).
 export function PaymentStep({ seats, passengers, total, busy, onBack, onPay }) {
   return (
     <div>
@@ -26,7 +27,7 @@ export function PaymentStep({ seats, passengers, total, busy, onBack, onPay }) {
 
       <div className="mt-5 rounded-xl border border-mint-200 bg-mint-50 p-4">
         <div className="flex items-center gap-2 font-bold text-pine-700"><CreditCard size={19} aria-hidden="true" /> Tarjeta de débito o crédito</div>
-        <p className="mt-1.5 text-sm text-ink-soft">Entorno de pruebas: el pago se procesa con el simulador de la pasarela y siempre se aprueba. No se realiza ningún cobro.</p>
+        <p className="mt-1.5 text-sm text-ink-soft">El pago con tarjeta aún no está habilitado en el sistema: la compra se registra y se confirma sin cobro a tu tarjeta.</p>
       </div>
 
       <p className="mt-4 flex items-start gap-2 text-sm text-ink-soft">
