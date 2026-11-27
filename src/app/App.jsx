@@ -12,11 +12,12 @@ import { HelpPage } from '../pages/HelpPage'
 function ScrollManager() {
   const { pathname, hash } = useLocation()
   useEffect(() => {
-    if (hash) {
-      const target = document.getElementById(hash.slice(1))
-      if (target) return target.scrollIntoView()
-    }
-    window.scrollTo(0, 0)
+    // Ojo: el efecto no debe devolver el resultado de scrollIntoView(). En
+    // Chrome reciente devuelve una Promise y React la trataría como función de
+    // limpieza, rompiendo la app (pantalla en blanco) al cambiar de página.
+    const target = hash ? document.getElementById(hash.slice(1)) : null
+    if (target) target.scrollIntoView()
+    else window.scrollTo(0, 0)
   }, [pathname, hash])
   return null
 }

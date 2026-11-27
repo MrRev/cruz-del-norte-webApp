@@ -12,8 +12,11 @@ export const NAV_LINKS = [
 
 export function Header({ overlay = false }) {
   const [open, setOpen] = useState(false)
-  const { pathname } = useLocation()
-  useEffect(() => { setOpen(false) }, [pathname])
+  const location = useLocation()
+  // Cierra el menú móvil en cualquier navegación (atrás/adelante incluidos)…
+  useEffect(() => { setOpen(false) }, [location.key])
+  // …y también al tocar un enlace aunque lleve a la misma página.
+  const close = () => setOpen(false)
 
   const light = overlay && !open
   const desktopLink = ({ isActive }) => {
@@ -39,9 +42,9 @@ export function Header({ overlay = false }) {
       {open && (
         <nav id="menu-movil" className="border-t border-line bg-white px-4 pb-4 md:hidden" aria-label="Principal móvil">
           {NAV_LINKS.map(link => (
-            <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => `block border-b border-line py-3 text-[15px] font-medium ${isActive ? 'text-pine-600' : 'text-ink'}`}>{link.label}</NavLink>
+            <NavLink key={link.to} to={link.to} end={link.end} onClick={close} className={({ isActive }) => `block border-b border-line py-3 text-[15px] font-medium ${isActive ? 'text-pine-600' : 'text-ink'}`}>{link.label}</NavLink>
           ))}
-          <Link to="/#buscar" className="mt-4 block rounded-lg bg-amber-400 py-3 text-center font-bold text-pine-900">Comprar pasaje</Link>
+          <Link to="/#buscar" onClick={close} className="mt-4 block rounded-lg bg-amber-400 py-3 text-center font-bold text-pine-900">Comprar pasaje</Link>
         </nav>
       )}
     </header>
