@@ -2,16 +2,15 @@ import { request } from '../../../shared/api/http'
 import { todayISO } from '../../../shared/format'
 import { OPERATED_ROUTES, UPCOMING_DAYS } from './catalog'
 
-// SC-01: salidas de una ruta y fecha.
+// Salidas de una ruta y fecha (api/disponibilidad.js → SC-01).
 export async function searchTrips({ origen, destino, fecha }) {
-  const params = new URLSearchParams({ origen, destino, fecha })
-  const data = await request(`/api/v1/viajes/disponibilidad?${params}`)
-  return data || { origen, destino, fecha, viajes: [] } // 204 = sin salidas
+  const data = await request(`/api/disponibilidad?${new URLSearchParams({ origen, destino, fecha })}`)
+  return data || { origen, destino, fecha, viajes: [] }
 }
 
-// SC-01: mapa de asientos con estado y precio de cada uno.
+// Mapa de asientos con estado y precio de cada uno (api/asientos.js → SC-01).
 export async function getSeatMap(idViaje) {
-  return request(`/api/v1/viajes/${idViaje}/asientos`)
+  return request(`/api/asientos?${new URLSearchParams({ idViaje })}`)
 }
 
 const addDays = (iso, days) => {
