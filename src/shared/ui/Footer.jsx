@@ -17,7 +17,6 @@ export function Footer() {
             <li><Link to="/#buscar" className="hover:text-white">Comprar pasaje</Link></li>
             <li><Link to="/destinos" className="hover:text-white">Destinos</Link></li>
             <li><Link to="/servicios" className="hover:text-white">Servicios</Link></li>
-            <li><Link to="/mis-pasajes" className="hover:text-white">Mis pasajes</Link></li>
             <li><Link to="/ayuda" className="hover:text-white">Preguntas frecuentes</Link></li>
           </ul>
         </div>

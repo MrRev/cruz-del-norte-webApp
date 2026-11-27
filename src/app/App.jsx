@@ -6,7 +6,6 @@ import { SearchResultsPage } from '../pages/SearchResultsPage'
 import { InfoPage } from '../pages/InfoPage'
 import { DestinationsPage } from '../pages/DestinationsPage'
 import { ServicesPage } from '../pages/ServicesPage'
-import { MyTicketsPage } from '../pages/MyTicketsPage'
 import { HelpPage } from '../pages/HelpPage'
 
 // Al cambiar de página vuelve arriba; si la URL trae #ancla, baja a esa sección.
@@ -39,7 +38,6 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/destinos" element={<DestinationsPage />} />
             <Route path="/servicios" element={<ServicesPage />} />
-            <Route path="/mis-pasajes" element={<MyTicketsPage />} />
             <Route path="/ayuda" element={<HelpPage />} />
             <Route path="/viajes" element={<SearchResultsPage />} />
             <Route path="/compra/:idViaje" element={

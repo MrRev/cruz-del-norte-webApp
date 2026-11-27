@@ -7,7 +7,6 @@ export const NAV_LINKS = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/destinos', label: 'Destinos' },
   { to: '/servicios', label: 'Servicios' },
-  { to: '/mis-pasajes', label: 'Mis pasajes' },
   { to: '/ayuda', label: 'Ayuda' },
 ]
 

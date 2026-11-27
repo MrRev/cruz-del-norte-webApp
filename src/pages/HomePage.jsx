@@ -1,4 +1,4 @@
-import { ArrowRight, BusFront, CircleHelp, TicketCheck } from 'lucide-react'
+import { ArrowRight, BusFront, CircleHelp } from 'lucide-react'
 import { Link } from 'react-router'
 import { Header } from '../shared/ui/Header'
 import { Hero } from '../features/landing/components/Hero'
@@ -8,7 +8,6 @@ import { SectionHeading } from '../features/landing/components/SectionHeading'
 
 const shortcuts = [
   { to: '/servicios', icon: BusFront, title: 'Servicios y flota', text: 'Conoce nuestros buses de uno y dos pisos y todo lo que incluye tu viaje.' },
-  { to: '/mis-pasajes', icon: TicketCheck, title: 'Mis pasajes', text: 'Consulta el estado de tu pasaje o vuelve a descargarlo con tu código y DNI.' },
   { to: '/ayuda', icon: CircleHelp, title: 'Ayuda', text: 'Equipaje, menores de edad, cambios y devoluciones. Y cómo contactarnos.' },
 ]
 
@@ -34,7 +33,7 @@ export function HomePage() {
         <section className="py-16 sm:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHeading eyebrow="Explora" title="Todo para tu viaje" />
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
               {shortcuts.map(({ to, icon: Icon, title, text }) => (
                 <Link key={to} to={to} className="group rounded-2xl border border-line bg-white p-6 transition hover:border-mint-500 hover:shadow-lg hover:shadow-pine-900/5">
                   <span className="grid size-11 place-items-center rounded-xl bg-mint-100 text-pine-600"><Icon size={21} aria-hidden="true" /></span>

@@ -35,7 +35,6 @@ Cada opción de la barra de navegación tiene su propia página:
 | `/` | Inicio: buscador, 3 rutas destacadas, pasos de compra y accesos al resto |
 | `/destinos` | Todas las rutas + buscador |
 | `/servicios` | Beneficios, cómo comprar y flota |
-| `/mis-pasajes` | Consulta de pasaje por código + DNI |
 | `/ayuda` | Preguntas frecuentes por tema, contacto y agencias |
 | `/viajes?origen=&destino=&fecha=` | Resultados de búsqueda |
 
@@ -48,7 +47,6 @@ Cada opción de la barra de navegación tiene su propia página:
 Con `VITE_USE_MOCKS=true`:
 
 - Rutas desde Lima a Trujillo, Chimbote, Chiclayo, Piura, Ica y Huaraz (y viceversa). Otras combinaciones devuelven "sin salidas".
-- Mis pasajes: código `CN-DEMO-001` con DNI `45871236`.
 
 Las respuestas imitan el formato real del backend (`DisponibilidadResponse` de SC-01), así que el cambio a la API real no requiere tocar componentes.
 
@@ -60,7 +58,6 @@ Hoy todos los endpoints de venta exigen un token con rol `VENTAS`, que no puede 
 |---|---|
 | `GET /api/v1/publico/rutas` | Ciudades y rutas populares (`{ ciudades, rutas }`) |
 | `GET /api/v1/publico/viajes/disponibilidad` | Resultados de búsqueda |
-| `GET /api/v1/publico/pasajes/{codigo}?dni=` | Mis pasajes |
 | Retención de asiento, pasajeros, pago y emisión con token de compra de invitado | Flujo de compra (siguiente fase) |
 
 ## Estructura
@@ -72,7 +69,6 @@ src/
   features/
     landing/components/       secciones reutilizables (hero, rutas, servicios, FAQ)
     travel/                   buscador y servicio de viajes (+ datos de ejemplo)
-    tickets/                  consulta de pasajes
   shared/
     api/http.js               cliente HTTP (sin tokens del personal)
     ui/                       cabecera, pie, logo y encabezado de página
